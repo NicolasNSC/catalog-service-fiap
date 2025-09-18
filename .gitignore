@@ -1,0 +1,8 @@
+build/bin
+
+#vscode
+.idea
+.vscode
+cmd/catalog-service-fiap/__debug_bin
+.env
+coverage.out
