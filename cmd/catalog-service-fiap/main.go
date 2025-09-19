@@ -13,7 +13,6 @@ import (
 	"github.com/NicolasNSC/catalog-service-fiap/internal/usecase"
 	"github.com/go-chi/chi"
 	_ "github.com/jackc/pgx/v5/stdlib"
-	_ "github.com/NicolasNSC/catalog-service-fiap/docs"
 	"github.com/joho/godotenv"
 )
 
