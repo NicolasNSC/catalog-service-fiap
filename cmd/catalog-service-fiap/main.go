@@ -13,6 +13,7 @@ import (
 	"github.com/NicolasNSC/catalog-service-fiap/internal/usecase"
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 func main() {

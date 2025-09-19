@@ -1,0 +1,38 @@
+services:
+  db_catalog:
+    image: postgres:14-alpine
+    container_name: db_catalog
+    restart: always
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - "5433:5432" 
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app_catalog:
+    build: . 
+    container_name: app_catalog
+    restart: always
+    environment:
+      - API_PORT=${API_PORT}
+      - DB_HOST=db_catalog 
+      - DB_PORT=5432       
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+    ports:
+      - "${API_PORT}:${API_PORT}"
+    depends_on:
+      - db_catalog 
+
+volumes:
+  postgres-data:
