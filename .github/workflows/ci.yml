@@ -1,0 +1,53 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Test and Coverage Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+      - name: Download dependencies
+        run: go mod download
+
+      - name: Run tests and generate coverage report
+        run: go test ./... -coverprofile=coverage.out -covermode=atomic
+
+      - name: Check test coverage
+        run: |
+          COVERAGE=$(go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//')
+          echo "Current coverage is ${COVERAGE}%"
+          if (( $(echo "$COVERAGE < 80.0" | bc -l) )); then
+            echo "Error: Test coverage is below 80%."
+            exit 1
+          fi
+
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    needs: test 
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Download dependencies
+        run: go mod download
+      
+      - name: Build
+        run: go build -v ./cmd/catalog-service-fiap/main.go
