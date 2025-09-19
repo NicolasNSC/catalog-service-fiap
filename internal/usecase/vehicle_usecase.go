@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
+//go:generate mockgen -source=vehicle_usecase.go -destination=./mocks/vehicle_usecase_mock.go -package=mocks
 type VehicleUseCaseInterface interface {
 	Create(ctx context.Context, input dto.InputCreateVehicleDTO) (*dto.OutputCreateVehicleDTO, error)
 	Update(ctx context.Context, id string, input dto.InputUpdateVehicleDTO) error
