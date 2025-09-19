@@ -15,6 +15,9 @@ cov: test
 gen: 
 	go generate ./...
 
+swagger:
+	swagger generate spec -o ./swagger.yaml --scan-models
+
 docker-up:
 	docker-compose up -d --build
 

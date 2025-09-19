@@ -6,3 +6,4 @@ build/bin
 cmd/catalog-service-fiap/__debug_bin
 .env
 coverage.out
+docs/
