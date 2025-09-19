@@ -11,5 +11,6 @@ func SetupRoutes(router *chi.Mux, vehicleHandler *VehicleHandler) {
 
 	router.Route("/vehicles", func(r chi.Router) {
 		r.Post("/add", vehicleHandler.Create)
+		r.Put("/{id}", vehicleHandler.Update)
 	})
 }

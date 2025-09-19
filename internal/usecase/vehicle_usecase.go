@@ -5,24 +5,15 @@ import (
 	"time"
 
 	"github.com/NicolasNSC/catalog-service-fiap/internal/domain"
+	"github.com/NicolasNSC/catalog-service-fiap/internal/dto"
 	"github.com/NicolasNSC/catalog-service-fiap/internal/repository"
+	"github.com/NicolasNSC/catalog-service-fiap/internal/utils"
+	"github.com/google/uuid"
 )
 
-type InputCreateVehicleDTO struct {
-	Brand string  `json:"brand"`
-	Model string  `json:"model"`
-	Year  int     `json:"year"`
-	Color string  `json:"color"`
-	Price float64 `json:"price"`
-}
-
-type OutputCreateVehicleDTO struct {
-	ID        string `json:"id"`
-	CreatedAt string `json:"created_at"`
-}
-
 type VehicleUseCaseInterface interface {
-	Create(ctx context.Context, input InputCreateVehicleDTO) (*OutputCreateVehicleDTO, error)
+	Create(ctx context.Context, input dto.InputCreateVehicleDTO) (*dto.OutputCreateVehicleDTO, error)
+	Update(ctx context.Context, id string, input dto.InputUpdateVehicleDTO) error
 }
 
 type vehicleUseCase struct {
@@ -35,10 +26,21 @@ func NewVehicleUseCase(repo repository.VehicleRepository) VehicleUseCaseInterfac
 	}
 }
 
-func (v *vehicleUseCase) Create(ctx context.Context, input InputCreateVehicleDTO) (*OutputCreateVehicleDTO, error) {
-	vehicle, err := domain.NewVehicle(input.Brand, input.Model, input.Color, input.Year, input.Price)
+func (v *vehicleUseCase) Create(ctx context.Context, input dto.InputCreateVehicleDTO) (*dto.OutputCreateVehicleDTO, error) {
+	err := utils.ValidateVehicleFields(input.Brand, input.Model, input.Year, input.Price)
 	if err != nil {
 		return nil, err
+	}
+
+	vehicle := &domain.Vehicle{
+		ID:        uuid.New().String(),
+		Brand:     input.Brand,
+		Model:     input.Model,
+		Year:      input.Year,
+		Color:     input.Color,
+		Price:     input.Price,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 
 	err = v.repo.Save(ctx, vehicle)
@@ -46,10 +48,31 @@ func (v *vehicleUseCase) Create(ctx context.Context, input InputCreateVehicleDTO
 		return nil, err
 	}
 
-	output := &OutputCreateVehicleDTO{
+	output := &dto.OutputCreateVehicleDTO{
 		ID:        vehicle.ID,
 		CreatedAt: vehicle.CreatedAt.Format(time.RFC3339),
 	}
 
 	return output, nil
+}
+
+func (uc *vehicleUseCase) Update(ctx context.Context, id string, input dto.InputUpdateVehicleDTO) error {
+	vehicle, err := uc.repo.GetByID(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	err = utils.ValidateVehicleFields(input.Brand, input.Model, input.Year, input.Price)
+	if err != nil {
+		return err
+	}
+
+	vehicle.Brand = input.Brand
+	vehicle.Model = input.Model
+	vehicle.Color = input.Color
+	vehicle.Year = input.Year
+	vehicle.Price = input.Price
+	vehicle.UpdatedAt = time.Now()
+
+	return uc.repo.Update(ctx, vehicle)
 }
