@@ -11,9 +11,9 @@ import (
 	handler "github.com/NicolasNSC/catalog-service-fiap/internal/handler/http"
 	"github.com/NicolasNSC/catalog-service-fiap/internal/repository"
 	"github.com/NicolasNSC/catalog-service-fiap/internal/usecase"
-	"github.com/go-chi/chi/v5"
-	"github.com/joho/godotenv"
+	"github.com/go-chi/chi"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/joho/godotenv"
 )
 
 func main() {
