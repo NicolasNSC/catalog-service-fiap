@@ -50,4 +50,4 @@ jobs:
         run: go mod download
       
       - name: Build
-        run: go build -v ./cmd/api/main.go
+        run: go build -v ./cmd/catalog-service-fiap/main.go
