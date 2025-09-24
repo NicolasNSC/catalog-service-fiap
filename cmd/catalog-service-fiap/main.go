@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/NicolasNSC/catalog-service-fiap/internal/client"
 	handler "github.com/NicolasNSC/catalog-service-fiap/internal/handler/http"
 	"github.com/NicolasNSC/catalog-service-fiap/internal/repository"
 	"github.com/NicolasNSC/catalog-service-fiap/internal/usecase"
@@ -22,8 +23,11 @@ func main() {
 	db := setupDatabase()
 	defer db.Close()
 
+	showcaseURL := os.Getenv("SHOWCASE_SERVICE_URL")
+	showcaseClient := client.NewShowcaseClient(showcaseURL)
+
 	repo := repository.NewPostgresVehicleRepository(db)
-	useCase := usecase.NewVehicleUseCase(repo)
+	useCase := usecase.NewVehicleUseCase(repo, showcaseClient)
 	vehicleHandler := handler.NewVehicleHandler(useCase)
 
 	router := setupRouter(vehicleHandler)
