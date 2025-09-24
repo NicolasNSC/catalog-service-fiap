@@ -20,3 +20,10 @@ type InputUpdateVehicleDTO struct {
 	Color string  `json:"color"`
 	Price float64 `json:"price"`
 }
+
+type CreateListingDTO struct {
+	VehicleID string  `json:"vehicle_id"`
+	Brand     string  `json:"brand"`
+	Model     string  `json:"model"`
+	Price     float64 `json:"price"`
+}

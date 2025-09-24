@@ -2,8 +2,10 @@ package usecase
 
 import (
 	"context"
+	"log"
 	"time"
 
+	"github.com/NicolasNSC/catalog-service-fiap/internal/client"
 	"github.com/NicolasNSC/catalog-service-fiap/internal/domain"
 	"github.com/NicolasNSC/catalog-service-fiap/internal/dto"
 	"github.com/NicolasNSC/catalog-service-fiap/internal/repository"
@@ -18,16 +20,18 @@ type VehicleUseCaseInterface interface {
 }
 
 type vehicleUseCase struct {
-	repo repository.VehicleRepository
+	repo           repository.VehicleRepository
+	showcaseClient client.ShowcaseClientInterface
 }
 
-func NewVehicleUseCase(repo repository.VehicleRepository) VehicleUseCaseInterface {
+func NewVehicleUseCase(repo repository.VehicleRepository, showcaseClient client.ShowcaseClientInterface) VehicleUseCaseInterface {
 	return &vehicleUseCase{
-		repo: repo,
+		repo:           repo,
+		showcaseClient: showcaseClient,
 	}
 }
 
-func (v *vehicleUseCase) Create(ctx context.Context, input dto.InputCreateVehicleDTO) (*dto.OutputCreateVehicleDTO, error) {
+func (vuc *vehicleUseCase) Create(ctx context.Context, input dto.InputCreateVehicleDTO) (*dto.OutputCreateVehicleDTO, error) {
 	err := utils.ValidateVehicleFields(input.Brand, input.Model, input.Year, input.Price)
 	if err != nil {
 		return nil, err
@@ -44,9 +48,21 @@ func (v *vehicleUseCase) Create(ctx context.Context, input dto.InputCreateVehicl
 		UpdatedAt: time.Now(),
 	}
 
-	err = v.repo.Save(ctx, vehicle)
+	err = vuc.repo.Save(ctx, vehicle)
 	if err != nil {
 		return nil, err
+	}
+
+	listingDTO := dto.CreateListingDTO{
+		VehicleID: vehicle.ID,
+		Brand:     vehicle.Brand,
+		Model:     vehicle.Model,
+		Price:     vehicle.Price,
+	}
+
+	err = vuc.showcaseClient.CreateListing(ctx, listingDTO)
+	if err != nil {
+		log.Printf("Warning: failed to notify showcase-service about new vehicle %s: %v", vehicle.ID, err)
 	}
 
 	output := &dto.OutputCreateVehicleDTO{
@@ -57,8 +73,8 @@ func (v *vehicleUseCase) Create(ctx context.Context, input dto.InputCreateVehicl
 	return output, nil
 }
 
-func (uc *vehicleUseCase) Update(ctx context.Context, id string, input dto.InputUpdateVehicleDTO) error {
-	vehicle, err := uc.repo.GetByID(ctx, id)
+func (vuc *vehicleUseCase) Update(ctx context.Context, id string, input dto.InputUpdateVehicleDTO) error {
+	vehicle, err := vuc.repo.GetByID(ctx, id)
 	if err != nil {
 		return err
 	}
@@ -75,5 +91,5 @@ func (uc *vehicleUseCase) Update(ctx context.Context, id string, input dto.Input
 	vehicle.Price = input.Price
 	vehicle.UpdatedAt = time.Now()
 
-	return uc.repo.Update(ctx, vehicle)
+	return vuc.repo.Update(ctx, vehicle)
 }
