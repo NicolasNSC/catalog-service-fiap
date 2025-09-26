@@ -62,3 +62,57 @@ func TestCreateListing_HTTPError(t *testing.T) {
 		t.Fatal("expected error, got nil")
 	}
 }
+
+func TestUpdateListing_Success(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPut {
+			t.Errorf("expected PUT, got %s", r.Method)
+		}
+		expectedPath := "/listings/vehicle/123"
+		if r.URL.Path != expectedPath {
+			t.Errorf("expected path %s, got %s", expectedPath, r.URL.Path)
+		}
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer server.Close()
+
+	showcaseClient := client.NewShowcaseClient(server.URL)
+
+	data := dto.UpdateListingDTO{
+		Brand: "Honda",
+		Model: "Civic",
+		Price: 120000,
+	}
+
+	err := showcaseClient.UpdateListing(context.Background(), "123", data)
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+}
+
+func TestUpdateListing_NonSuccessStatus(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusBadRequest)
+	}))
+	defer server.Close()
+
+	showcaseClient := client.NewShowcaseClient(server.URL)
+
+	data := dto.UpdateListingDTO{}
+
+	err := showcaseClient.UpdateListing(context.Background(), "123", data)
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+}
+
+func TestUpdateListing_HTTPError(t *testing.T) {
+	showcaseClient := client.NewShowcaseClient("http://invalid-host")
+
+	data := dto.UpdateListingDTO{}
+
+	err := showcaseClient.UpdateListing(context.Background(), "123", data)
+	if err == nil {
+		t.Fatal("expected error, got nil")
+	}
+}

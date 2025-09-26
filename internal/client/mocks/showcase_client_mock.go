@@ -54,3 +54,17 @@ func (mr *MockShowcaseClientInterfaceMockRecorder) CreateListing(ctx, data any) 
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateListing", reflect.TypeOf((*MockShowcaseClientInterface)(nil).CreateListing), ctx, data)
 }
+
+// UpdateListing mocks base method.
+func (m *MockShowcaseClientInterface) UpdateListing(ctx context.Context, vehicleID string, data dto.UpdateListingDTO) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateListing", ctx, vehicleID, data)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateListing indicates an expected call of UpdateListing.
+func (mr *MockShowcaseClientInterfaceMockRecorder) UpdateListing(ctx, vehicleID, data any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateListing", reflect.TypeOf((*MockShowcaseClientInterface)(nil).UpdateListing), ctx, vehicleID, data)
+}
