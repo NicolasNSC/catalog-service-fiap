@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/NicolasNSC/catalog-service-fiap/internal/dto"
@@ -13,6 +14,7 @@ import (
 //go:generate mockgen -source=showcase_client.go -destination=./mocks/showcase_client_mock.go -package=mocks
 type ShowcaseClientInterface interface {
 	CreateListing(ctx context.Context, data dto.CreateListingDTO) error
+	UpdateListing(ctx context.Context, vehicleID string, data dto.UpdateListingDTO) error
 }
 
 type httpShowcaseClient struct {
@@ -35,6 +37,33 @@ func (c *httpShowcaseClient) CreateListing(ctx context.Context, data dto.CreateL
 
 	url := c.baseURL + "/listings"
 	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewBuffer(payload))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return errors.New("showcase service returned non-success status: " + resp.Status)
+	}
+
+	return nil
+}
+
+func (c *httpShowcaseClient) UpdateListing(ctx context.Context, vehicleID string, data dto.UpdateListingDTO) error {
+	payload, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	url := fmt.Sprintf("%s/listings/vehicle/%s", c.baseURL, vehicleID)
+
+	req, err := http.NewRequestWithContext(ctx, "PUT", url, bytes.NewBuffer(payload))
 	if err != nil {
 		return err
 	}

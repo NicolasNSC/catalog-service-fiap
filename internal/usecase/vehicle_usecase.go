@@ -91,5 +91,21 @@ func (vuc *vehicleUseCase) Update(ctx context.Context, id string, input dto.Inpu
 	vehicle.Price = input.Price
 	vehicle.UpdatedAt = time.Now()
 
-	return vuc.repo.Update(ctx, vehicle)
+	err = vuc.repo.Update(ctx, vehicle)
+	if err != nil {
+		return err
+	}
+
+	listingDTO := dto.UpdateListingDTO{
+		Brand: vehicle.Brand,
+		Model: vehicle.Model,
+		Price: vehicle.Price,
+	}
+
+	err = vuc.showcaseClient.UpdateListing(ctx, vehicle.ID, listingDTO)
+	if err != nil {
+		log.Printf("Warning: failed to notify showcase-service about vehicle update %s: %v", vehicle.ID, err)
+	}
+
+	return nil
 }

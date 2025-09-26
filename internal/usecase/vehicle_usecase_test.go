@@ -115,12 +115,9 @@ func (suite *VehicleUseCaseSuite) Test_Update() {
 	}
 
 	suite.T().Run("should update a vehicle successfully", func(t *testing.T) {
-		suite.repository.EXPECT().
-			GetByID(suite.ctx, id).
-			Return(existingVehicle, nil)
-		suite.repository.EXPECT().
-			Update(suite.ctx, gomock.Any()).
-			Return(nil)
+		suite.repository.EXPECT().GetByID(suite.ctx, id).Return(existingVehicle, nil)
+		suite.repository.EXPECT().Update(suite.ctx, gomock.Any()).Return(nil)
+		suite.showcaseClient.EXPECT().UpdateListing(suite.ctx, id, gomock.Any()).Return(nil)
 
 		usecase := usecase.NewVehicleUseCase(suite.repository, suite.showcaseClient)
 		err := usecase.Update(suite.ctx, id, input)
@@ -166,5 +163,15 @@ func (suite *VehicleUseCaseSuite) Test_Update() {
 		usecase := usecase.NewVehicleUseCase(suite.repository, suite.showcaseClient)
 		err := usecase.Update(suite.ctx, id, input)
 		suite.Error(err)
+	})
+
+	suite.T().Run("should log warning when showcase client fails but still update vehicle", func(t *testing.T) {
+		suite.repository.EXPECT().GetByID(suite.ctx, id).Return(existingVehicle, nil)
+		suite.repository.EXPECT().Update(suite.ctx, gomock.Any()).Return(nil)
+		suite.showcaseClient.EXPECT().UpdateListing(suite.ctx, id, gomock.Any()).Return(assert.AnError)
+
+		usecase := usecase.NewVehicleUseCase(suite.repository, suite.showcaseClient)
+		err := usecase.Update(suite.ctx, id, input)
+		suite.NoError(err)
 	})
 }

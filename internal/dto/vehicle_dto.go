@@ -27,3 +27,9 @@ type CreateListingDTO struct {
 	Model     string  `json:"model"`
 	Price     float64 `json:"price"`
 }
+
+type UpdateListingDTO struct {
+	Brand string  `json:"brand"`
+	Model string  `json:"model"`
+	Price float64 `json:"price"`
+}
