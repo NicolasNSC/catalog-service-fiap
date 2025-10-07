@@ -15,6 +15,9 @@ cov: test
 gen: 
 	go generate ./...
 
+swagger:
+	swag init -g ./cmd/catalog-service-fiap/main.go -o ./docs --parseDependency --parseInternal
+
 docker-up:
 	docker-compose up -d --build
 

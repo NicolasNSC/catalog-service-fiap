@@ -28,6 +28,9 @@ Utilize o Makefile para construir e iniciar a aplicação e o banco de dados:
 make docker-up
 ```
 
+A API estará disponível em [http://localhost:8080](http://localhost:8080).  
+A documentação Swagger estará em [http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html).
+
 ## Comandos Úteis (Makefile)
 
 - `make docker-up`: Sobe os containers da aplicação e do banco de dados.
@@ -38,6 +41,9 @@ make docker-up
 
 ## Endpoints da API
 
+A documentação interativa completa está disponível em `/swagger/index.html`.
+
+### Endpoints Públicos
+
 - `POST /vehicles/add`: Cadastra um novo veículo.
 - `PUT /vehicles/{id}`: Atualiza os dados de um veículo existente.
-
