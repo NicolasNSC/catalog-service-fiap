@@ -31,6 +31,17 @@ func NewVehicleUseCase(repo repository.VehicleRepository, showcaseClient client.
 	}
 }
 
+// Create is the handler for the POST /vehicles endpoint.
+// @Summary      Create a new vehicle
+// @Description  Adds a new vehicle to the catalog.
+// @Tags         Vehicles
+// @Accept       json
+// @Produce      json
+// @Param        vehicle  body      dto.InputCreateVehicleDTO  true  "Vehicle data to create"
+// @Success      201      {object}  dto.OutputCreateVehicleDTO
+// @Failure      400      {string}  string "Invalid request body"
+// @Failure      500      {string}  string "Internal server error"
+// @Router       /vehicles/add [post]
 func (vuc *vehicleUseCase) Create(ctx context.Context, input dto.InputCreateVehicleDTO) (*dto.OutputCreateVehicleDTO, error) {
 	err := utils.ValidateVehicleFields(input.Brand, input.Model, input.Year, input.Price)
 	if err != nil {
@@ -73,6 +84,19 @@ func (vuc *vehicleUseCase) Create(ctx context.Context, input dto.InputCreateVehi
 	return output, nil
 }
 
+// Update is the handler for the PUT /vehicles/{id} endpoint.
+// @Summary      Update an existing vehicle
+// @Description  Updates the data of a vehicle by its ID.
+// @Tags         Vehicles
+// @Accept       json
+// @Produce      json
+// @Param        id       path      string                     true  "Vehicle ID"
+// @Param        vehicle  body      dto.InputUpdateVehicleDTO  true  "Vehicle data to update"
+// @Success      200      {string}  string "OK"
+// @Failure      400      {string}  string "Invalid request body or ID"
+// @Failure      404      {string}  string "Vehicle not found"
+// @Failure      500      {string}  string "Internal server error"
+// @Router       /vehicles/{id} [put]
 func (vuc *vehicleUseCase) Update(ctx context.Context, id string, input dto.InputUpdateVehicleDTO) error {
 	vehicle, err := vuc.repo.GetByID(ctx, id)
 	if err != nil {

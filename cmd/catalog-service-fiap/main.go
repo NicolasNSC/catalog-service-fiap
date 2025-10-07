@@ -17,6 +17,15 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// @title           Catalog Service API
+// @version         1.0
+// @description     Microservice for managing the vehicle catalog.
+
+// @contact.name   API Support
+// @contact.email  dev@suaempresa.com
+
+// @host      localhost:8080
+// @BasePath  /
 func main() {
 	loadConfig()
 

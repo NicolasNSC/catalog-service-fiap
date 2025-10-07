@@ -1,10 +1,10 @@
 all: build run
 
 build: 
-	go build ./cmd/catalog-service-fiap
+	go build -o build/bin/catalog-service-fiap ./cmd/catalog-service-fiap
 
 run:
-	./catalog-service-fiap
+	./build/bin/catalog-service-fiap
 
 test: 
 	go test -covermode=atomic -coverprofile=coverage.out `go list ./... | grep -v mocks | grep -v cmd | grep -v testdata`
